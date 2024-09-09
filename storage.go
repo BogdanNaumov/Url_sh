@@ -90,12 +90,16 @@ func (s *PostgresStorage) SaveURL(shortURL, originalURL string) error {
 // Получение оригинального URL по сокращенному из PostgreSQL
 func (s *PostgresStorage) GetURL(shortURL string) (string, error) {
 	var originalURL string
+
+	// Выполняем запрос и проверяем на ошибки
 	err := s.db.QueryRow("SELECT original_url FROM urls WHERE short_url = $1", shortURL).Scan(&originalURL)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return "", errors.New("URL not found")
 		}
-		return "", err
+		return "", errors.New("query error: " + err.Error())
+
 	}
+
 	return originalURL, nil
 }
